@@ -1,6 +1,7 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
+pd.options.mode.chained_assignment = None
 
 
 def calculate_moving_average(data, window=20):
@@ -24,7 +25,7 @@ def local_smoothing_moving_average(data, window=20):
     data["lSMA_"+str(window)] = data["Close"].rolling(window=window, min_periods=2).apply(
         lambda x: np.polyfit(np.arange(len(x)), x, 1)[0] * (len(x)-1) + np.polyfit(np.arange(len(x)), x, 1)[1])
     # Using iloc replcae the first element of Lsmas with the first element of Close
-    data["lSMA_"+str(window)].iat[0] = data["Close"].iat[0]
+    data["lSMA_"+str(window)].iloc[0] = data["Close"].iloc[0]
     return data
 
 
@@ -35,7 +36,7 @@ def MACD(data):
     data["Signal_Line"] = data["MACD"].ewm(span=9, adjust=False).mean()
     data["Histogram"] = data["MACD"] - \
         data["Signal_Line"]  # MACD - Signal Line
-    return
+    return data
 
 
 def RSI(data):
@@ -65,6 +66,7 @@ def enrich_signal(data):
     data["TR"] = abs(data["High"] - data["Low"])
     data["ATR"] = data["TR"].ewm(span=14, adjust=False).mean()
     data['Log_Volume'] = np.log1p(data['Volume'])
-    MACD(data)
-    RSI(data)
+    data = MACD(data)
+    data = RSI(data)
+    return data
 # test enrich singla function
