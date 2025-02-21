@@ -24,8 +24,9 @@ def local_smoothing_moving_average(data, window=20):
     # calculating a local linear smoothing moving average with a polyfit of degree 1
     data["lSMA_"+str(window)] = data["Close"].rolling(window=window, min_periods=2).apply(
         lambda x: np.polyfit(np.arange(len(x)), x, 1)[0] * (len(x)-1) + np.polyfit(np.arange(len(x)), x, 1)[1])
-    # Using iloc replcae the first element of Lsmas with the first element of Close
-    data["lSMA_"+str(window)].iloc[0] = data["Close"].iloc[0]
+    # Using replace method to replace nan values with the first value of the close price
+    data["lSMA_"+str(window)] = np.where(data["lSMA_"+str(window)
+                                              ].isnull(), data["Close"], data["lSMA_"+str(window)])
     return data
 
 
